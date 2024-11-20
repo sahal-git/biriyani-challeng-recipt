@@ -23,67 +23,59 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f0f0;
     }
 
     .container {
-      flex: 1;
+      width: 90%;
       display: flex;
       flex-direction: column;
+      align-items: center;
     }
 
     .editor {
-      padding: 10px;
+      padding: 20px;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
       gap: 10px;
-      background-color: #f4f4f4;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
     }
 
     #canvas-preview-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #fff;
-      margin: 10px auto;
-      border: 1px solid #ccc;
-      width: 80%; /* Scaled preview area */
-      height: 80%; /* Scaled preview area */
-      overflow: hidden;
+      display: none; /* Hide canvas preview initially */
     }
 
     #posterCanvas {
-      border: 1px solid #ddd;
+      display: none; /* Hide the canvas itself */
     }
 
-    input, button, textarea, select {
+    input, button {
       padding: 8px;
       font-size: 14px;
       margin: 5px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    #updateText,
     #downloadPoster {
       background-color: #8c0f0d;
       color: #fff;
       border: none;
       cursor: pointer;
-      padding: 10px 20px;
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    #updateText:hover,
     #downloadPoster:hover {
       background-color: #a80f0d;
-    }
-
-    .info {
-      font-size: 14px;
-      color: #333;
-    }
-
-    label {
-      font-size: 14px;
-      margin-top: 5px;
     }
   </style>
 </head>
@@ -92,37 +84,14 @@
     <div class="editor">
       <label for="name">Name:</label>
       <input type="text" id="name" placeholder="Enter Name" />
-      
+
       <label for="quantity">Quantity:</label>
       <input type="text" id="quantity" placeholder="Enter Quantity" />
 
-      <label for="fontFamily">Font Family:</label>
-      <select id="fontFamily" disabled>
-        <option value="Noto Sans">Noto Sans</option>
-      </select>
-
-      <label for="fontWeight">Font Weight:</label>
-      <select id="fontWeight" disabled>
-        <option value="700">700 (Bold)</option>
-      </select>
-
-      <label for="textColor">Text Color:</label>
-      <input type="color" id="textColor" value="#8c0f0d" />
-
-      <button id="updateText">Update Poster</button>
       <button id="downloadPoster">Download Poster</button>
-
-      <div class="info">
-        <p>Quantity Text Position: X: <span id="posX">233</span>, Y: <span id="posY">379</span></p>
-        <p>Quantity Text Scale: <span id="quantityTextScale">0.35</span></p>
-
-        <p>Name Text Position: X: <span id="namePosX">75</span>, Y: <span id="namePosY">403</span></p>
-        <p>Name Text Scale: <span id="nameTextScale">0.32</span></p>
-      </div>
     </div>
 
     <div id="canvas-preview-container">
-      <!-- Canvas for poster editing -->
       <canvas id="posterCanvas"></canvas>
     </div>
   </div>
@@ -133,7 +102,7 @@
       selection: false,
     });
 
-    // Load Poster Background
+    // Load Poster Background Image
     fabric.Image.fromURL('frame thanks biriyani.jpg', function (img) {
       const imgAspectRatio = img.width / img.height;
       const containerWidth = window.innerWidth * 0.8;
@@ -160,41 +129,34 @@
       });
 
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+      logCanvasDetails(); // Log canvas details after background image is set
     });
 
     // Create Name and Quantity Text Objects with Fixed Positions and Scales
     const nameText = new fabric.Textbox('Enter Name', {
       left: 75,  // Fixed position for Name
       top: 403,  // Fixed position for Name
-      fontFamily: 'Noto Sans', // Fixed font family
-      fontWeight: '700', // Fixed weight
-      fill: '#8c0f0d', // Default color
+      fontFamily: 'Noto Sans',
+      fontWeight: '700',
+      fill: '#8c0f0d',
       fontSize: 50,
       width: 1000,
       editable: true,
-      borderColor: 'blue',
-      cornerColor: 'blue',
-      cornerSize: 10,
-      transparentCorners: false,
-      scaleX: 0.32,  // Fixed scale for Name
-      scaleY: 0.32,  // Fixed scale for Name
+      scaleX: 0.32,
+      scaleY: 0.32,
     });
 
     const quantityText = new fabric.Textbox('Enter Quantity', {
-      left: 233,  // Fixed position for Quantity (updated to 233)
+      left: 233,  // Fixed position for Quantity
       top: 379,   // Fixed position for Quantity
-      fontFamily: 'Noto Sans', // Fixed font family
-      fontWeight: '700', // Fixed weight
-      fill: '#000000', // Black color for quantity
+      fontFamily: 'Noto Sans',
+      fontWeight: '700',
+      fill: '#000000',
       fontSize: 50,
       width: 1000,
       editable: true,
-      borderColor: 'blue',
-      cornerColor: 'blue',
-      cornerSize: 10,
-      transparentCorners: false,
-      scaleX: 0.35,  // Fixed scale for Quantity (updated to 0.35)
-      scaleY: 0.35,  // Fixed scale for Quantity
+      scaleX: 0.35,
+      scaleY: 0.35,
     });
 
     canvas.add(nameText, quantityText);
@@ -203,57 +165,50 @@
     document.getElementById('name').addEventListener('input', function() {
       nameText.text = this.value || 'Enter Name';
       canvas.renderAll();
+      logCanvasDetails(); // Log details after updating Name
     });
 
     document.getElementById('quantity').addEventListener('input', function() {
       quantityText.text = this.value || 'Enter Quantity';
       canvas.renderAll();
+      logCanvasDetails(); // Log details after updating Quantity
     });
 
-    // Update the text properties dynamically
-    document.getElementById('updateText').addEventListener('click', () => {
-      const textColor = document.getElementById('textColor').value;
-
-      // Update Name text color
-      nameText.set({
-        fill: textColor,
-      });
-
-      // Quantity text color is fixed to black
-      quantityText.set({
-        fill: '#000000', // Black color
-      });
-
-      // Render updated text on the canvas
-      canvas.renderAll();
-    });
-
-    // Display text position (X, Y) dynamically
-    nameText.on('moving', () => {
-      document.getElementById('namePosX').innerText = Math.round(nameText.left);
-      document.getElementById('namePosY').innerText = Math.round(nameText.top);
-    });
-
-    quantityText.on('moving', () => {
-      document.getElementById('posX').innerText = Math.round(quantityText.left);
-      document.getElementById('posY').innerText = Math.round(quantityText.top);
-    });
-
-    // Handle download action
+    // Automatically download the updated poster when clicked
     document.getElementById('downloadPoster').addEventListener('click', () => {
+      // Render all canvas elements before downloading
+      canvas.renderAll();
+
+      // Create a link to download the canvas as a PNG image
       const link = document.createElement('a');
-      link.href = canvas.toDataURL({ format: 'png', quality: 1.0 });
-      link.download = 'edited-poster.png';
+      link.href = canvas.toDataURL({ format: 'jpg', quality: 1.0 });
+      link.download = 'edited-poster.jpg';
       link.click();
     });
 
-    function test(){
-      console.log("V1");
-
-      
+    // Function to log the canvas details (for debugging purposes)
+    function logCanvasDetails() {
+      console.clear(); // Clears previous logs for a cleaner output
+      console.log('--- Canvas Details ---');
+      console.log(`Canvas Size: ${canvas.width} x ${canvas.height}`);
+      console.log(`Canvas Background Image:`);
+      console.log(`  - Width: ${canvas.backgroundImage.width}`);
+      console.log(`  - Height: ${canvas.backgroundImage.height}`);
+      console.log(`  - Scale X: ${canvas.backgroundImage.scaleX}`);
+      console.log(`  - Scale Y: ${canvas.backgroundImage.scaleY}`);
+      console.log('----------------------------------');
+      console.log(`Name Text Position: X: ${nameText.left}, Y: ${nameText.top}`);
+      console.log(`Name Text Scale: X: ${nameText.scaleX}, Y: ${nameText.scaleY}`);
+      console.log(`Name Text Font Size: ${nameText.fontSize}`);
+      console.log(`Name Text Fill Color: ${nameText.fill}`);
+      console.log('----------------------------------');
+      console.log(`Quantity Text Position: X: ${quantityText.left}, Y: ${quantityText.top}`);
+      console.log(`Quantity Text Scale: X: ${quantityText.scaleX}, Y: ${quantityText.scaleY}`);
+      console.log(`Quantity Text Font Size: ${quantityText.fontSize}`);
+      console.log(`Quantity Text Fill Color: ${quantityText.fill}`);
+      console.log('----------------------------------');
     }
 
-    test()
   </script>
 </body>
 </html>
