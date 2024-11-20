@@ -23,61 +23,67 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: #f0f0f0;
     }
 
     .container {
-      width: 90%;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
     }
 
     .editor {
-      padding: 20px;
+      padding: 10px;
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-      max-width: 500px;
-      width: 100%;
+      background-color: #f4f4f4;
     }
 
     #canvas-preview-container {
-      display: none; /* Hide canvas preview */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      width: 80%; /* Scaled preview area */
+      height: 80%; /* Scaled preview area */
+      overflow: hidden;
     }
 
     #posterCanvas {
-      display: block; /* Ensure canvas is visible */
-      margin-top: 20px;
-      border: 1px solid #000;
+      border: 1px solid #ddd;
     }
 
-    input, button {
+    input, button, textarea, select {
       padding: 8px;
       font-size: 14px;
       margin: 5px;
-      width: 100%;
-      box-sizing: border-box;
     }
 
+    #updateText,
     #downloadPoster {
       background-color: #8c0f0d;
       color: #fff;
       border: none;
       cursor: pointer;
-      padding: 10px;
-      margin-top: 10px;
-      width: 100%;
-      box-sizing: border-box;
+      padding: 10px 20px;
     }
 
+    #updateText:hover,
     #downloadPoster:hover {
       background-color: #a80f0d;
+    }
+
+    .info {
+      font-size: 14px;
+      color: #333;
+    }
+
+    label {
+      font-size: 14px;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -86,84 +92,109 @@
     <div class="editor">
       <label for="name">Name:</label>
       <input type="text" id="name" placeholder="Enter Name" />
-
+      
       <label for="quantity">Quantity:</label>
       <input type="text" id="quantity" placeholder="Enter Quantity" />
 
+      <label for="fontFamily">Font Family:</label>
+      <select id="fontFamily" disabled>
+        <option value="Noto Sans">Noto Sans</option>
+      </select>
+
+      <label for="fontWeight">Font Weight:</label>
+      <select id="fontWeight" disabled>
+        <option value="700">700 (Bold)</option>
+      </select>
+
+      <label for="textColor">Text Color:</label>
+      <input type="color" id="textColor" value="#8c0f0d" />
+
+      <button id="updateText">Update Poster</button>
       <button id="downloadPoster">Download Poster</button>
+
+      <div class="info">
+        <p>Quantity Text Position: X: <span id="posX">233</span>, Y: <span id="posY">379</span></p>
+        <p>Quantity Text Scale: <span id="quantityTextScale">0.35</span></p>
+
+        <p>Name Text Position: X: <span id="namePosX">75</span>, Y: <span id="namePosY">403</span></p>
+        <p>Name Text Scale: <span id="nameTextScale">0.32</span></p>
+      </div>
     </div>
 
     <div id="canvas-preview-container">
-      <canvas id="posterCanvas" width="2550" height="2896"></canvas> <!-- Correct canvas size in px -->
+      <!-- Canvas for poster editing -->
+      <canvas id="posterCanvas"></canvas>
     </div>
   </div>
 
   <script>
-    // Initialize Fabric.js Canvas with correct size (2550 x 2896)
+    // Initialize Fabric.js Canvas
     const canvas = new fabric.Canvas('posterCanvas', {
-      width: 2550,  // Set canvas width
-      height: 2896, // Set canvas height
       selection: false,
     });
 
-    // Function to scale the background image to the correct canvas size
-    function scaleImageToCanvas(img) {
-      const canvasWidth = 2550;
-      const canvasHeight = 2896;
-
+    // Load Poster Background
+    fabric.Image.fromURL('frame thanks biriyani.jpg', function (img) {
       const imgAspectRatio = img.width / img.height;
-      const canvasAspectRatio = canvasWidth / canvasHeight;
+      const containerWidth = window.innerWidth * 0.8;
+      const containerHeight = window.innerHeight * 0.8;
 
-      if (imgAspectRatio > canvasAspectRatio) {
-        // Scale width to canvas width, adjust height
-        img.scaleToWidth(canvasWidth);
-        img.scaleToHeight(img.height * (canvasWidth / img.width));
+      let canvasWidth, canvasHeight;
+
+      if (containerWidth / containerHeight > imgAspectRatio) {
+        canvasHeight = containerHeight;
+        canvasWidth = containerHeight * imgAspectRatio;
       } else {
-        // Scale height to canvas height, adjust width
-        img.scaleToHeight(canvasHeight);
-        img.scaleToWidth(img.width * (canvasHeight / img.height));
+        canvasWidth = containerWidth;
+        canvasHeight = containerWidth / imgAspectRatio;
       }
 
+      canvas.setWidth(canvasWidth);
+      canvas.setHeight(canvasHeight);
+
       img.set({
-        left: 0,
-        top: 0,
+        scaleX: canvasWidth / img.width,
+        scaleY: canvasHeight / img.height,
         selectable: false,
         evented: false,
       });
 
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-    }
-
-    // Load Poster Background (Image)
-    fabric.Image.fromURL('frame thanks biriyani.jpg', function (img) {
-      scaleImageToCanvas(img);
     });
 
     // Create Name and Quantity Text Objects with Fixed Positions and Scales
     const nameText = new fabric.Textbox('Enter Name', {
-      left: 61,  // Updated position for Name (X: 61, Y: 321)
-      top: 321,  // Updated position for Name
+      left: 75,  // Fixed position for Name
+      top: 403,  // Fixed position for Name
       fontFamily: 'Noto Sans', // Fixed font family
       fontWeight: '700', // Fixed weight
       fill: '#8c0f0d', // Default color
-      fontSize: 150,    // Fixed font size for clarity
+      fontSize: 50,
       width: 1000,
       editable: true,
-      scaleX: 0.32,  // Updated scale for Name (Scale: 0.32)
-      scaleY: 0.32,  // Updated scale for Name
+      borderColor: 'blue',
+      cornerColor: 'blue',
+      cornerSize: 10,
+      transparentCorners: false,
+      scaleX: 0.32,  // Fixed scale for Name
+      scaleY: 0.32,  // Fixed scale for Name
     });
 
     const quantityText = new fabric.Textbox('Enter Quantity', {
-      left: 185,  // Updated position for Quantity (X: 185, Y: 301)
-      top: 301,   // Updated position for Quantity
+      left: 233,  // Fixed position for Quantity (updated to 233)
+      top: 379,   // Fixed position for Quantity
       fontFamily: 'Noto Sans', // Fixed font family
       fontWeight: '700', // Fixed weight
       fill: '#000000', // Black color for quantity
-      fontSize: 150,    // Fixed font size for clarity
+      fontSize: 50,
       width: 1000,
       editable: true,
-      scaleX: 0.35,  // Updated scale for Quantity (Scale: 0.35)
-      scaleY: 0.35,  // Updated scale for Quantity
+      borderColor: 'blue',
+      cornerColor: 'blue',
+      cornerSize: 10,
+      transparentCorners: false,
+      scaleX: 0.35,  // Fixed scale for Quantity (updated to 0.35)
+      scaleY: 0.35,  // Fixed scale for Quantity
     });
 
     canvas.add(nameText, quantityText);
@@ -172,40 +203,57 @@
     document.getElementById('name').addEventListener('input', function() {
       nameText.text = this.value || 'Enter Name';
       canvas.renderAll();
-      logCanvasDetails();  // Log details after each update
     });
 
     document.getElementById('quantity').addEventListener('input', function() {
       quantityText.text = this.value || 'Enter Quantity';
       canvas.renderAll();
-      logCanvasDetails();  // Log details after each update
     });
 
-    // Automatically download the updated poster when clicked
-    document.getElementById('downloadPoster').addEventListener('click', () => {
-      // Render all canvas elements before downloading
-      canvas.renderAll();
+    // Update the text properties dynamically
+    document.getElementById('updateText').addEventListener('click', () => {
+      const textColor = document.getElementById('textColor').value;
 
-      // Create a link to download the canvas as a PNG image
+      // Update Name text color
+      nameText.set({
+        fill: textColor,
+      });
+
+      // Quantity text color is fixed to black
+      quantityText.set({
+        fill: '#000000', // Black color
+      });
+
+      // Render updated text on the canvas
+      canvas.renderAll();
+    });
+
+    // Display text position (X, Y) dynamically
+    nameText.on('moving', () => {
+      document.getElementById('namePosX').innerText = Math.round(nameText.left);
+      document.getElementById('namePosY').innerText = Math.round(nameText.top);
+    });
+
+    quantityText.on('moving', () => {
+      document.getElementById('posX').innerText = Math.round(quantityText.left);
+      document.getElementById('posY').innerText = Math.round(quantityText.top);
+    });
+
+    // Handle download action
+    document.getElementById('downloadPoster').addEventListener('click', () => {
       const link = document.createElement('a');
       link.href = canvas.toDataURL({ format: 'png', quality: 1.0 });
       link.download = 'edited-poster.png';
       link.click();
     });
 
-    // Function to log the canvas details
-    function logCanvasDetails() {
-      console.log('--- Canvas Details ---');
-      console.log(`Canvas Size: ${canvas.width} x ${canvas.height}`);
-      console.log(`Name Text Position: X: ${nameText.left}, Y: ${nameText.top}`);
-      console.log(`Name Text Scale: ${nameText.scaleX} (X), ${nameText.scaleY} (Y)`);
-      console.log(`Quantity Text Position: X: ${quantityText.left}, Y: ${quantityText.top}`);
-      console.log(`Quantity Text Scale: ${quantityText.scaleX} (X), ${quantityText.scaleY} (Y)`);
-      console.log('-----------------------');
+    function test(){
+      console.log("V1");
+
+      
     }
 
-    // Log the details on initial load
-    logCanvasDetails();
+    test()
   </script>
 </body>
 </html>
