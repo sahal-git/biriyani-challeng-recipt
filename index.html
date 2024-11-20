@@ -169,11 +169,13 @@
     document.getElementById('name').addEventListener('input', function() {
       nameText.text = this.value || 'Enter Name';
       canvas.renderAll();
+      logCanvasDetails();  // Log details after each update
     });
 
     document.getElementById('quantity').addEventListener('input', function() {
       quantityText.text = this.value || 'Enter Quantity';
       canvas.renderAll();
+      logCanvasDetails();  // Log details after each update
     });
 
     // Automatically download the updated poster when clicked
@@ -183,10 +185,24 @@
 
       // Create a link to download the canvas as a PNG image
       const link = document.createElement('a');
-      link.href = canvas.toDataURL({ format: 'jpg', quality: 1.0 });
-      link.download = 'edited-poster.jpg';
+      link.href = canvas.toDataURL({ format: 'png', quality: 1.0 });
+      link.download = 'edited-poster.png';
       link.click();
     });
+
+    // Function to log the canvas details
+    function logCanvasDetails() {
+      console.log('--- Canvas Details ---');
+      console.log(`Canvas Size: ${canvas.width} x ${canvas.height}`);
+      console.log(`Name Text Position: X: ${nameText.left}, Y: ${nameText.top}`);
+      console.log(`Name Text Scale: ${nameText.scaleX} (X), ${nameText.scaleY} (Y)`);
+      console.log(`Quantity Text Position: X: ${quantityText.left}, Y: ${quantityText.top}`);
+      console.log(`Quantity Text Scale: ${quantityText.scaleX} (X), ${quantityText.scaleY} (Y)`);
+      console.log('-----------------------');
+    }
+
+    // Log the details on initial load
+    logCanvasDetails();
   </script>
 </body>
 </html>
