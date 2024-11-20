@@ -93,13 +93,15 @@
     </div>
 
     <div id="canvas-preview-container">
-      <canvas id="posterCanvas" width="2550" height="2896"></canvas> <!-- Explicit size in px -->
+      <canvas id="posterCanvas" width="2550" height="2896"></canvas> <!-- Correct canvas size in px -->
     </div>
   </div>
 
   <script>
-    // Initialize Fabric.js Canvas with a fixed size (canvas dimensions as specified)
+    // Initialize Fabric.js Canvas with correct size (2550 x 2896)
     const canvas = new fabric.Canvas('posterCanvas', {
+      width: 2550,  // Set canvas width
+      height: 2896, // Set canvas height
       selection: false,
     });
 
@@ -198,7 +200,7 @@
       console.log(`Name Text Scale: ${nameText.scaleX} (X), ${nameText.scaleY} (Y)`);
       console.log(`Quantity Text Position: X: ${quantityText.left}, Y: ${quantityText.top}`);
       console.log(`Quantity Text Scale: ${quantityText.scaleX} (X), ${quantityText.scaleY} (Y)`);
-      console.log('-----------------------');
+      console.log('V2');
     }
 
     // Log the details on initial load
