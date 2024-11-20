@@ -132,7 +132,7 @@
     }
 
     // Load Poster Background (Image)
-    fabric.Image.fromURL('frame thanks biriyani copy.jpg', function (img) {
+    fabric.Image.fromURL('frame thanks biriyani.jpg', function (img) {
       scaleImageToCanvas(img);
     });
 
@@ -183,8 +183,8 @@
 
       // Create a link to download the canvas as a PNG image
       const link = document.createElement('a');
-      link.href = canvas.toDataURL({ format: 'png', quality: 1.0 });
-      link.download = 'edited-poster.png';
+      link.href = canvas.toDataURL({ format: 'jpg', quality: 1.0 });
+      link.download = 'edited-poster.jpg';
       link.click();
     });
   </script>
