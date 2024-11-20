@@ -130,33 +130,32 @@
 
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
       logCanvasDetails(); // Log canvas details after background image is set
+
+      // Update text positions based on the canvas size and background image
+      updateTextPositions(canvasWidth, canvasHeight, img.width, img.height);
     });
 
     // Create Name and Quantity Text Objects with Fixed Positions and Scales
     const nameText = new fabric.Textbox('Enter Name', {
-      left: 75,  // Fixed position for Name
-      top: 403,  // Fixed position for Name
+      left: 75,  // Fixed position for Name (will be dynamically updated)
+      top: 403,  // Fixed position for Name (will be dynamically updated)
       fontFamily: 'Noto Sans',
       fontWeight: '700',
       fill: '#8c0f0d',
       fontSize: 50,
       width: 1000,
       editable: true,
-      scaleX: 0.32,
-      scaleY: 0.32,
     });
 
     const quantityText = new fabric.Textbox('Enter Quantity', {
-      left: 233,  // Fixed position for Quantity
-      top: 379,   // Fixed position for Quantity
+      left: 233,  // Fixed position for Quantity (will be dynamically updated)
+      top: 379,   // Fixed position for Quantity (will be dynamically updated)
       fontFamily: 'Noto Sans',
       fontWeight: '700',
       fill: '#000000',
       fontSize: 50,
       width: 1000,
       editable: true,
-      scaleX: 0.35,
-      scaleY: 0.35,
     });
 
     canvas.add(nameText, quantityText);
@@ -186,6 +185,31 @@
       link.click();
     });
 
+    // Function to update text positions based on canvas size and background image size
+    function updateTextPositions(canvasWidth, canvasHeight, imgWidth, imgHeight) {
+      const nameTextWidthRatio = 0.25; // 25% of the canvas width
+      const nameTextHeightRatio = 0.20; // 20% of the canvas height
+
+      const quantityTextWidthRatio = 0.35; // 35% of the canvas width
+      const quantityTextHeightRatio = 0.18; // 18% of the canvas height
+
+      // Dynamically calculate positions and scaling for text based on canvas size
+      nameText.set({
+        left: canvasWidth * nameTextWidthRatio,
+        top: canvasHeight * nameTextHeightRatio,
+        fontSize: canvasWidth * 0.1, // Adjust font size based on canvas width
+      });
+
+      quantityText.set({
+        left: canvasWidth * quantityTextWidthRatio,
+        top: canvasHeight * quantityTextHeightRatio,
+        fontSize: canvasWidth * 0.12, // Adjust font size based on canvas width
+      });
+
+      canvas.renderAll(); // Re-render canvas with updated positions
+      logCanvasDetails(); // Log updated canvas details
+    }
+
     // Function to log the canvas details (for debugging purposes)
     function logCanvasDetails() {
       console.clear(); // Clears previous logs for a cleaner output
@@ -198,14 +222,9 @@
       console.log(`  - Scale Y: ${canvas.backgroundImage.scaleY}`);
       console.log('----------------------------------');
       console.log(`Name Text Position: X: ${nameText.left}, Y: ${nameText.top}`);
-      console.log(`Name Text Scale: X: ${nameText.scaleX}, Y: ${nameText.scaleY}`);
       console.log(`Name Text Font Size: ${nameText.fontSize}`);
-      console.log(`Name Text Fill Color: ${nameText.fill}`);
-      console.log('----------------------------------');
       console.log(`Quantity Text Position: X: ${quantityText.left}, Y: ${quantityText.top}`);
-      console.log(`Quantity Text Scale: X: ${quantityText.scaleX}, Y: ${quantityText.scaleY}`);
       console.log(`Quantity Text Font Size: ${quantityText.fontSize}`);
-      console.log(`Quantity Text Fill Color: ${quantityText.fill}`);
       console.log('----------------------------------');
     }
 
