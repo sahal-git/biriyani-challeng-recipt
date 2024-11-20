@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Poster Editor</title>
+  
+  <!-- Link to Google Fonts for Noto Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .editor {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    #canvas-preview-container {
+      display: none; /* Hide canvas preview */
+    }
+
+    #posterCanvas {
+      display: none; /* Hide the canvas itself */
+    }
+
+    input, button {
+      padding: 8px;
+      font-size: 14px;
+      margin: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #downloadPoster {
+      background-color: #8c0f0d;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #downloadPoster:hover {
+      background-color: #a80f0d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="editor">
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="Enter Name" />
+
+      <label for="quantity">Quantity:</label>
+      <input type="text" id="quantity" placeholder="Enter Quantity" />
+
+      <button id="downloadPoster">Download Poster</button>
+    </div>
+
+    <div id="canvas-preview-container">
+      <canvas id="posterCanvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Fabric.js Canvas
+    const canvas = new fabric.Canvas('posterCanvas', {
+      selection: false,
+    });
+
+    // Load Poster Background
+    fabric.Image.fromURL('frame thanks biriyani copy.jpg', function (img) {
+      const imgAspectRatio = img.width / img.height;
+      const containerWidth = window.innerWidth * 0.8;
+      const containerHeight = window.innerHeight * 0.8;
+
+      let canvasWidth, canvasHeight;
+
+      if (containerWidth / containerHeight > imgAspectRatio) {
+        canvasHeight = containerHeight;
+        canvasWidth = containerHeight * imgAspectRatio;
+      } else {
+        canvasWidth = containerWidth;
+        canvasHeight = containerWidth / imgAspectRatio;
+      }
+
+      canvas.setWidth(canvasWidth);
+      canvas.setHeight(canvasHeight);
+
+      img.set({
+        scaleX: canvasWidth / img.width,
+        scaleY: canvasHeight / img.height,
+        selectable: false,
+        evented: false,
+      });
+
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+    });
+
+    // Create Name and Quantity Text Objects with Fixed Positions and Scales
+    const nameText = new fabric.Textbox('Enter Name', {
+      left: 75,  // Fixed position for Name
+      top: 403,  // Fixed position for Name
+      fontFamily: 'Noto Sans', // Fixed font family
+      fontWeight: '700', // Fixed weight
+      fill: '#8c0f0d', // Default color
+      fontSize: 50,
+      width: 1000,
+      editable: true,
+      scaleX: 0.32,  // Fixed scale for Name
+      scaleY: 0.32,  // Fixed scale for Name
+    });
+
+    const quantityText = new fabric.Textbox('Enter Quantity', {
+      left: 233,  // Fixed position for Quantity
+      top: 379,   // Fixed position for Quantity
+      fontFamily: 'Noto Sans', // Fixed font family
+      fontWeight: '700', // Fixed weight
+      fill: '#000000', // Black color for quantity
+      fontSize: 50,
+      width: 1000,
+      editable: true,
+      scaleX: 0.35,  // Fixed scale for Quantity
+      scaleY: 0.35,  // Fixed scale for Quantity
+    });
+
+    canvas.add(nameText, quantityText);
+
+    // Link the input fields to the canvas text objects
+    document.getElementById('name').addEventListener('input', function() {
+      nameText.text = this.value || 'Enter Name';
+      canvas.renderAll();
+    });
+
+    document.getElementById('quantity').addEventListener('input', function() {
+      quantityText.text = this.value || 'Enter Quantity';
+      canvas.renderAll();
+    });
+
+    // Automatically download the updated poster when clicked
+    document.getElementById('downloadPoster').addEventListener('click', () => {
+      // Render all canvas elements before downloading
+      canvas.renderAll();
+
+      // Create a link to download the canvas as a PNG image
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL({ format: 'png', quality: 1.0 });
+      link.download = 'edited-poster.png';
+      link.click();
+    });
+  </script>
+</body>
+</html>
