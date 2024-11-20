@@ -52,7 +52,8 @@
     }
 
     #posterCanvas {
-      display: none; /* Hide the canvas itself */
+      display: block; /* Ensure canvas is visible */
+      margin-top: 20px;
     }
 
     input, button {
@@ -92,40 +93,25 @@
     </div>
 
     <div id="canvas-preview-container">
-      <canvas id="posterCanvas"></canvas>
+      <canvas id="posterCanvas" width="2550" height="2896"></canvas> <!-- Explicit size in px -->
     </div>
   </div>
 
   <script>
-    // Initialize Fabric.js Canvas
+    // Initialize Fabric.js Canvas with a fixed size (canvas dimensions as specified)
     const canvas = new fabric.Canvas('posterCanvas', {
       selection: false,
     });
 
-    // Load Poster Background
+    // Load Poster Background (Image)
     fabric.Image.fromURL('frame thanks biriyani copy.jpg', function (img) {
-      const imgAspectRatio = img.width / img.height;
-      const containerWidth = window.innerWidth * 0.8;
-      const containerHeight = window.innerHeight * 0.8;
-
-      let canvasWidth, canvasHeight;
-
-      if (containerWidth / containerHeight > imgAspectRatio) {
-        canvasHeight = containerHeight;
-        canvasWidth = containerHeight * imgAspectRatio;
-      } else {
-        canvasWidth = containerWidth;
-        canvasHeight = containerWidth / imgAspectRatio;
-      }
-
-      canvas.setWidth(canvasWidth);
-      canvas.setHeight(canvasHeight);
-
       img.set({
-        scaleX: canvasWidth / img.width,
-        scaleY: canvasHeight / img.height,
+        left: 0,
+        top: 0,
         selectable: false,
         evented: false,
+        scaleX: 2550 / img.width,  // Ensure scaling based on canvas width
+        scaleY: 2896 / img.height, // Ensure scaling based on canvas height
       });
 
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
@@ -138,7 +124,7 @@
       fontFamily: 'Noto Sans', // Fixed font family
       fontWeight: '700', // Fixed weight
       fill: '#8c0f0d', // Default color
-      fontSize: 50,
+      fontSize: 150,    // Fixed font size for clarity
       width: 1000,
       editable: true,
       scaleX: 0.32,  // Fixed scale for Name
@@ -151,7 +137,7 @@
       fontFamily: 'Noto Sans', // Fixed font family
       fontWeight: '700', // Fixed weight
       fill: '#000000', // Black color for quantity
-      fontSize: 50,
+      fontSize: 150,    // Fixed font size for clarity
       width: 1000,
       editable: true,
       scaleX: 0.35,  // Fixed scale for Quantity
