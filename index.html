@@ -103,18 +103,37 @@
       selection: false,
     });
 
-    // Load Poster Background (Image)
-    fabric.Image.fromURL('frame thanks biriyani copy.jpg', function (img) {
+    // Function to scale the background image to the correct canvas size
+    function scaleImageToCanvas(img) {
+      const canvasWidth = 2550;
+      const canvasHeight = 2896;
+
+      const imgAspectRatio = img.width / img.height;
+      const canvasAspectRatio = canvasWidth / canvasHeight;
+
+      if (imgAspectRatio > canvasAspectRatio) {
+        // Scale width to canvas width, adjust height
+        img.scaleToWidth(canvasWidth);
+        img.scaleToHeight(img.height * (canvasWidth / img.width));
+      } else {
+        // Scale height to canvas height, adjust width
+        img.scaleToHeight(canvasHeight);
+        img.scaleToWidth(img.width * (canvasHeight / img.height));
+      }
+
       img.set({
         left: 0,
         top: 0,
         selectable: false,
         evented: false,
-        scaleX: 2550 / img.width,  // Ensure scaling based on canvas width
-        scaleY: 2896 / img.height, // Ensure scaling based on canvas height
       });
 
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+    }
+
+    // Load Poster Background (Image)
+    fabric.Image.fromURL('frame thanks biriyani copy.jpg', function (img) {
+      scaleImageToCanvas(img);
     });
 
     // Create Name and Quantity Text Objects with Fixed Positions and Scales
